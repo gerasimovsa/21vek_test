@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "21vek-test"
+version = "0.1.0"
+description = ""
+authors = ["ra9_adept <gerasimov.ra9@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pytest = "8.2.0"
+selene = "2.0.0rc9"
+allure-pytest = "2.13.5"
+python-dotenv = "1.0.1"
+requests = "2.31.0"
+jsonschema = "^4.23.0"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
