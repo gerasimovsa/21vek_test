@@ -1,6 +1,6 @@
 from allure import step
 from selene import browser, be, by, have, command
-from selenium.common import TimeoutException
+from selene.core.exceptions import TimeoutException
 
 
 class VekMainPage:
@@ -27,37 +27,6 @@ class VekMainPage:
             browser.element("[href='/profile/info/']").should(be.visible).click()
         return self
 
-    def header_open_cart_page(self):
-        with step("Open cart page from header"):
-            browser.element(".headerCart").should(be.visible).click()
-        return self
-
-    def header_open_favorites_page(self):
-        with step("Open favorites page from header"):
-            browser.element(".headerFavoritesBox").should(be.visible).click()
-        return self
-
-    def search_catalog_item(self, query: str):
-        with step(f"Enter {query} into the search bar"):
-            browser.element("#catalogSearch").type(query).press_enter()
-        return self
-
-    def open_catalog_category(self, category: str):
-        with step("Open catalog"):
-            browser.element(".styles_catalogButton__z9L_j").click()
-        with step(f"Select {category} category"):
-            browser.element(by.text(category)).click()
-        return self
-
-    def navigate_catalog_subcategory(self, category: str, subcategory: str):
-        with step("Open catalog"):
-            browser.element(".styles_catalogButton__z9L_j").click()
-        with step(f"Select {category} category"):
-            browser.element(by.text(category)).hover()
-        with step(f"Got to {subcategory} category"):
-            browser.element(by.text(subcategory)).click()
-        return self
-
     def open_auth_modal(self):
         with step("Open auth window"):
             self.open_account_menu()
@@ -68,7 +37,7 @@ class VekMainPage:
         with step("Open registration window"):
             self.open_account_menu()
             browser.element("[class='Button-module__buttonText']>span").should(be.visible).click()
-            browser.element("[class*='styles_secondaryAction__H7V7H']").should(be.visible).click()
+            browser.element(by.text("Регистрация")).should(be.visible).click()
         return self
 
     def submit_auth_form(self, email: str, password: str):
@@ -84,37 +53,31 @@ class VekMainPage:
             browser.element("[class*='BaseModalDesktop-module__modalOverlay'] path").should(be.visible).click()
         return self
 
-    def submit_registration_form(self, email):
-        with step("Fill email field"):
-            browser.element("#register-email").should(be.blank).type(email)
-        with step("Submit registration"):
-            browser.element(".Form-module__submitContainer>button").click()
-        return self
-
     def accept_personal_data_terms(self):
         with step("Agree personal data usage"):
             browser.element("[data-testid='agreeButton']").click()  # diagree - .Button-module__gray-secondary
+        return self
+
+    def submit_registration_form(self, email, phone=None):
+        try:
+            with step("Fill phone field"):
+                browser.element("[label='Номер телефона']").type(phone)
+            with step("Fill email field"):
+                browser.element("[label='Электронная почта']").type(email)
+            with step("Press continue and accept terms"):
+                browser.element("[class*='RegistrationFormNew_submit__9xq36']").click()
+                self.accept_personal_data_terms()
+        except TimeoutException:
+            with step("Fill email field"):
+                browser.element("#register-email").should(be.blank).type(email)
+            with step("Submit registration"):
+                browser.element(".Form-module__submitContainer>button").click()
         return self
 
     def user_log_out(self):
         with step("Log out user"):
             self.open_account_menu()
             browser.element("[href='/logout/']").should(be.visible).click()
-        return self
-
-    def change_location(self, location):
-        with step("Change user location"):
-            browser.element(".styles_localityBtn__qrGFQ").should(be.visible).click()
-            browser.element("[class*='select__value-container']").should(be.present).click()
-            browser.element(by.text(f"г. {location}")).should(be.visible).click()
-            browser.element("[class*='style_baseActionButtonMargin__4haYC']").should(be.visible).click()
-        return self
-
-    def press_up_button(self):
-        with step("Scroll down to footer"):
-            browser.element(".styles_legalInformationBlock__iXOVK").should(be.visible).perform(
-                command.js.scroll_into_view)
-            browser.element(".style_upButtonLabel__LPAA4").click()
         return self
 
     def should_have_account_menus_available(self, menu_titles):
@@ -137,13 +100,11 @@ class VekMainPage:
             browser.element(".userToolsSubtitle").should(be.not_.present)
         return self
 
-    def should_have_header_buttons(self):
-        browser.all(".styles_promoItem__aolWq").should(be.present)
-        browser.all(".styles_promoItem__aolWq").should(have.size(13))
+    def should_have_check_email_message(self):
+        try:
+            browser.element(".styles_errorText__LEN7M").should(be.present)
+            browser.element(".styles_errorText__LEN7M").should(have.text("Проверьте электронную почту"))
+        except TimeoutException:
+            browser.element(".ErrorMessageLink_container__7D0yM").should(be.present)
+            browser.element(".ErrorMessageLink_container__7D0yM").should(have.text("Проверьте электронную почту"))
         return self
-
-    def should_have_location_set(self, location: str):
-        with step("Check that location is set"):
-            browser.element(".styles_localityBtn__qrGFQ").should(have.exact_text(f"г. {location}"))
-        return self
-

@@ -15,7 +15,7 @@ def test_email_registration():
     app.main_page.open()
 
     app.main_page.open_registration_modal()
-    app.main_page.submit_registration_form("test_oz_001@gmail.com")
+    app.main_page.submit_registration_form("test_oz_001@gmail.com", "+375 (44) 582-16-20")
     app.main_page.accept_personal_data_terms()
 
     app.main_page.should_have_registration_successful()
@@ -85,32 +85,35 @@ def test_log_out():
     app.main_page.should_have_user_logged_out()
 
 
-@allure.title("Change location in header")
+@allure.title("User failed registration test")
 @allure.tag("ui")
 @allure.severity(Severity.CRITICAL)
-@allure.label("type", "POSITIVE")
-@allure.feature("Account menu")
-@allure.story("Verify that user can change location on header")
+@allure.label("type", "NEGATIVE")
+@allure.feature("Registration")
+@allure.story("Verify that user cannot register with used email")
 @allure.link('https://www.21vek.by/', name="Main Page")
-def test_header_change_location():
+def test_failed_email_registration():
     app.main_page.open()
 
-    app.main_page.change_location("Гомель")
+    app.main_page.open_registration_modal()
+    app.main_page.submit_registration_form(email="test_oz_001@gmail.com", phone="445821620")
 
-    app.main_page.should_have_location_set("Гомель")
+    app.main_page.should_have_check_email_message()
 
 
-@allure.title("Clicking on 'up' button")
+@allure.title("User failed authorization")
 @allure.tag("ui")
 @allure.severity(Severity.CRITICAL)
-@allure.label("type", "POSITIVE")
-@allure.feature("Account menu")
-@allure.story("Verify that user scroll back to the header by clicking on 'up' button")
+@allure.label("type", "NEGATIVE")
+@allure.feature("Authorization")
+@allure.story("Verify that failed authorization shows error")
 @allure.link('https://www.21vek.by/', name="Main Page")
-def test_up_button():
+def test_failed_email_authorization():
     app.main_page.open()
 
-    app.main_page.press_up_button()
+    app.main_page.open_auth_modal()
+    app.main_page.submit_auth_form("fake_email@gmail.com", "password")
 
-    app.main_page.should_have_header_buttons()
+    app.main_page.should_have_check_email_message()
+
 
