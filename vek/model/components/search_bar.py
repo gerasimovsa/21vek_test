@@ -7,3 +7,5 @@ class VekSearchBar:
         with step(f"Enter {query} into the search bar"):
             browser.element("#catalogSearch").type(query).press_enter()
         return self
+
+

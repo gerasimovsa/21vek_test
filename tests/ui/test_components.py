@@ -51,16 +51,25 @@ def test_navigate_catalog_category():
     app.catalog_tab.should_have_catalog_path("Мебель", "Мебель для жилых комнат", "Диваны")
 
 
-@allure.title("User navigate catalog test")
+@allure.title("User filter catalog items")
 @allure.tag("ui")
 @allure.severity(Severity.CRITICAL)
 @allure.label("type", "POSITIVE")
 @allure.feature("Catalog")
-@allure.story("Verify that user can navigate a catalog subcategory")
+@allure.story("Verify that user can filter a catalog")
 @allure.link('https://www.21vek.by/', name="Catalog Page")
 def test_filter_catalog():
     app.main_page.open()
+    app.catalog_tab.navigate_catalog_subcategory("Мебель", "Диваны")
 
-    app.main_page.navigate_catalog_subcategory("Мебель", "Диваны")
+    app.catalog_tab.reset_all_filters()
+    app.catalog_tab.set_price_range(800, 1200)
+    app.catalog_tab.enable_catalog_filters("для офиса", "Ящик для белья", "желтый")
+    app.footer.press_up_button()
 
-    app.catalog_tab.should_have_catalog_path("Мебель", "Мебель для жилых комнат", "Диваны")
+    app.catalog_tab.should_have_catalog_results(3, [
+        "Диван Лига Диванов Лига-020 стол слева / 118495L (микровельвет желтый/желтый/коричневый)",
+        "Диван Лига Диванов Лига-020 стол справа / 118495 (микровельвет желтый/желтый/коричневый)",
+        "Диван Лига Диванов Лига-019 / 118353 (микровельвет желтый/подушки желтый)"])
+    app.catalog_tab.should_have_filters_active("для офиса", "Ящик для белья", "желтый")
+
